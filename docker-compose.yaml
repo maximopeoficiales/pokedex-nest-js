@@ -1,0 +1,13 @@
+version: "3"
+services:
+  db:
+    image : mongo:5
+    container_name: db-pokedex-nestjs
+    environment:
+      - PUID:1000
+      - PGID:1000
+      - MONGODB_DATABASE:nest-pokedex
+    volumes:
+      - ./mongo:/data/db
+    ports:
+      - 27017:27017
