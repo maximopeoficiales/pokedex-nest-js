@@ -12,7 +12,19 @@ export class PokemonService {
     @InjectModel(Pokemon.name)
     private readonly pokemonModel: Model<Pokemon>
   ) {
+  }
 
+  async insertMany(data: CreatePokemonDto[]) {
+    try {
+      data.forEach((d) => {
+        d.name = d.name.toLowerCase();
+      });
+
+      const result = await this.pokemonModel.insertMany(data);
+      return result;
+    } catch (error) {
+      this.handleExceptions(error);
+    }
   }
   async create(createPokemonDto: CreatePokemonDto) {
     try {
@@ -70,12 +82,16 @@ export class PokemonService {
     // const pokemon = await this.findOne(id);
     // await pokemon.deleteOne();
     const { deletedCount } = await this.pokemonModel.deleteOne({ _id: id });
-    
+
     if (deletedCount === 0) throw new BadRequestException(`Pokemon with id "${id}" not found`);
 
     return;
   }
 
+  async removeMany() {
+    await this.pokemonModel.deleteMany({});
+    return;
+  }
   private handleExceptions(error: any) {
     if (error.code === 11000) {
       throw new BadRequestException(`Pokemon exists in db ${JSON.stringify(error.keyValue)}`)

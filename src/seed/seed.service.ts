@@ -1,21 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
+import { PokemonService } from 'src/pokemon/pokemon.service';
 import { PokeResponse } from './interfaces/poke-response';
 
 @Injectable()
 export class SeedService {
 
   private readonly axios: AxiosInstance = axios;
+  constructor(private readonly pokemonService: PokemonService) {
 
+  }
   async executeSeed() {
-    const { data } = await this.axios.get<PokeResponse>("https://pokeapi.co/api/v2/pokemon?limit=50");
+    await this.pokemonService.removeMany();
+    
+    const { data } = await this.axios.get<PokeResponse>("https://pokeapi.co/api/v2/pokemon?limit=650");
 
-    data.results.forEach(({ name, url }) => {
+    const dataFormated = data.results.map(({ name, url }) => {
       const segments = url.split("/");
       const no = +segments[segments.length - 2];
-      console.log({ name, no })
+      return { name, no }
     });
-    return data.results;
+
+    return await this.pokemonService.insertMany(dataFormated);
   }
 
 }
