@@ -41,3 +41,10 @@ http://localhost:3000/api/v2/seed
 * MongoDB
 * NestJs
 
+
+# Notas
+Heroku redeploy sin cambios:
+```
+git commit --allow-empty -m "New commint tigger heroku deploy"
+git push heroku <master|main>
+```
