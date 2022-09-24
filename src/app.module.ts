@@ -18,7 +18,7 @@ import { ConfigModule } from './config/config.module';
       rootPath: join(__dirname, '..', 'public'),
     }),
 
-    MongooseModule.forRoot("mongodb://localhost:27017/nest-pokedex"),
+    MongooseModule.forRoot(process.env.MONGO_DB),
 
     PokemonModule,
     CommonModule,
