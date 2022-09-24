@@ -1,11 +1,21 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { isValidObjectId, Model } from 'mongoose';
+import { ApiProperty } from '@nestjs/swagger';
+import { isValidObjectId, Model, Types } from 'mongoose';
 import { ConfigService } from 'src/config/config.service';
 import { CreatePokemonDto } from './dto/create-pokemon.dto';
 import { PaginationDto } from './dto/pagination.dto';
 import { UpdatePokemonDto } from './dto/update-pokemon.dto';
 import { Pokemon } from './entities/pokemon.entity';
+
+export class PokemonId extends Pokemon {
+  @ApiProperty(
+    {
+      type: "string",
+    }
+  )
+  _id: Types.ObjectId;
+}
 
 @Injectable()
 export class PokemonService {
@@ -16,7 +26,7 @@ export class PokemonService {
     private readonly configService: ConfigService
   ) {
     this.defaultLimit = this.configService.get<number>('DEFAULT_LIMIT');
-    
+
   }
 
   async insertMany(data: CreatePokemonDto[]) {
@@ -26,12 +36,12 @@ export class PokemonService {
       });
 
       const result = await this.pokemonModel.insertMany(data);
-      return result;
+      return result as PokemonId[];
     } catch (error) {
       this.handleExceptions(error);
     }
   }
-  async create(createPokemonDto: CreatePokemonDto) {
+  async create(createPokemonDto: CreatePokemonDto): Promise<PokemonId> {
     try {
       createPokemonDto.name = createPokemonDto.name.toLowerCase();
 
@@ -43,7 +53,7 @@ export class PokemonService {
     }
   }
 
-  async findAll(paginationDto: PaginationDto) {
+  async findAll(paginationDto: PaginationDto): Promise<PokemonId[]> {
     const { limit = this.defaultLimit, offset = 0 } = paginationDto;
     return this.pokemonModel.find()
       .limit(limit)
@@ -52,7 +62,7 @@ export class PokemonService {
       .select("-__v");
   }
 
-  async findOne(term: string) {
+  async findOne(term: string): Promise<Pokemon> {
     let pokemon: Pokemon;
 
     if (!isNaN(+term)) {
@@ -72,7 +82,7 @@ export class PokemonService {
     return pokemon;
   }
 
-  async update(term: string, updatePokemonDto: UpdatePokemonDto) {
+  async update(term: string, updatePokemonDto: UpdatePokemonDto): Promise<UpdatePokemonDto> {
 
     const pokemon = await this.findOne(term);
     try {
@@ -102,6 +112,7 @@ export class PokemonService {
     await this.pokemonModel.deleteMany({});
     return;
   }
+
   private handleExceptions(error: any) {
     if (error.code === 11000) {
       throw new BadRequestException(`Pokemon exists in db ${JSON.stringify(error.keyValue)}`)
