@@ -41,6 +41,15 @@ http://localhost:3000/api/v2/seed
 * MongoDB
 * NestJs
 
+# Production Build
+1. Crear el archivo __.env.prod__
+2. Llenar las variables de entorno de produccion
+3. Construir la imagen
+```
+docker-compose -f docker-compose.prod.yaml --env-file .env.prod up -d
+```
+
+
 
 # Notas
 Heroku redeploy sin cambios:
