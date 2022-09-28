@@ -8,6 +8,9 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
+    "docker:build": "docker-compose -f docker-compose.prod.yaml --env-file .env.prod up --build",
+    "docker:up": "docker-compose -f docker-compose.prod.yaml --env-file .env.prod up -d",
+    "docker:stop": "docker-compose -f docker-compose.prod.yaml --env-file .env.prod stop",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "node dist/main",
     "start:prod": "nest start",
